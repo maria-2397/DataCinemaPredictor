@@ -1,0 +1,72 @@
+preprocessing:
+  drop_columns: [
+    'movie_id',
+    'movie_name',
+    'genres',
+    'countries',
+    'Production',
+    'Special_effects']
+  change_type_columns:
+    type: category
+    ratingMpaa: category
+  current_year: 2019
+  year_column: year
+  variance_threshold: 0.018
+  data_separator: ;
+  original_data_path: ../data/raw/movies.csv
+
+  dummies:
+    columns: ['genres', 'countries', 'Special_effects', 'Production']
+    genres: ../data/processed/genres.json
+    countries: ../data/processed/countries.json
+    Special_effects: ../data/processed/studios_special_effects.json
+    Production: ../data/processed/studios_production.json
+    sequence_path: ../data/processed/dummies_train_sequence.json
+
+  grading_values:
+    age_rating_corr: {0: "g", 6: "pg", 12: "pg13", 16: "r", 18: "nc17"}
+    persons: ['Начинающие',
+              'Обычные',
+              'Известные',
+              'Звезды',
+              'Легендарные']
+    votes: ["Мало известный",
+            "Умеренно популярный",
+            "Хит сезона",
+            "Блокбастер",
+            "Культовый шедевр"]
+    await: ['Слабый интерес',
+            'Умеренный интерес',
+            'Грядущий фаворит',
+            'Широко обсуждаемый',
+            'Премьера, о которой говорят все']
+
+  unique_values_path: ../data/processed/unique_values.json
+  train_path_proc: ../data/processed/train.csv
+  test_path_proc: ../data/processed/test.csv
+  test_size: 0.2
+  target_column: fees_usa
+  log_target: True
+  random_state: 10
+
+train:
+  n_trials: 20
+  n_folds: 5
+  n_estimators: 200
+  random_state: 10
+  target_column: fees_usa
+  log_target: True
+  model_path: ../models/model_lgb.joblib
+  study_path: ../models/study.joblib
+  metrics_path: ../report/metrics.json
+  params_path: ../report/best_params.json
+
+evaluate:
+  predict_path: ../data/check/test.csv
+
+movie_logo_path: ../data/movie_logo.jpg
+
+endpoints:
+  train: 'http://fastapi:8000/train'
+  prediction_input: 'http://fastapi:8000/predict_input'
+  prediction_from_file: 'http://fastapi:8000/predict'
